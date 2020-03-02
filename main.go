@@ -13,7 +13,8 @@ import (
 	"time"
 )
 
-func producer(stream Stream, c chan *Tweet) {
+func producer(stream Stream, c chan *Tweet, start int) {
+	stream.pos = start
 	for {
 		tweet, err := stream.Next()
 		if err == ErrEOF {
@@ -26,14 +27,15 @@ func producer(stream Stream, c chan *Tweet) {
 
 func consumer(c chan *Tweet) {
 	for {
-		t, open := <-c
+		tweet, open := <-c
 		if !open {
 			break
 		}
-		if t.IsTalkingAboutGo() {
-			fmt.Println(t.Username, "\ttweets about golang")
+
+		if tweet.IsTalkingAboutGo() {
+			fmt.Println(tweet.Username, "\ttweets about golang")
 		} else {
-			fmt.Println(t.Username, "\tdoes not tweet about golang")
+			fmt.Println(tweet.Username, "\tdoes not tweet about golang")
 		}
 	}
 }
@@ -41,13 +43,26 @@ func consumer(c chan *Tweet) {
 func main() {
 	start := time.Now()
 	stream := GetMockStream()
-	c := make(chan *Tweet)
+	//length:= len(stream.tweets)
+	c1 := make(chan *Tweet)
+	c2 := make(chan *Tweet)
+	c3 := make(chan *Tweet)
+	c4 := make(chan *Tweet)
+	c5 := make(chan *Tweet)
 
 	// Producer
-	go producer(stream, c)
+	go producer(stream, c1, 0)
+	go producer(stream, c2, 1)
+	go producer(stream, c3, 2)
+	go producer(stream, c4, 3)
+	go producer(stream, c5, 4)
 
 	// Consumer
-	consumer(c)
+	go consumer(c1)
+	go consumer(c2)
+	go consumer(c3)
+	go consumer(c4)
+	consumer(c5)
 
 	fmt.Printf("Process took %s\n", time.Since(start))
 }
