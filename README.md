@@ -6,4 +6,6 @@ To achieve a faster performance I opened a channel and a go routine for each twe
 # Bug => fixed
 When many tweets are checked (>2000) some tweets are skipped. =>channels closed before producer can send input => channel closing back to be done by the producer, use global variable to check if all consumers are done...
 
+
+# Testing
 Unit testing only covers 13% of the code and tests only the function "IsTalkingAboutGo" because this is the only function with a return statement.
