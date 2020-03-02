@@ -15,10 +15,7 @@ import (
 
 func producer(stream Stream, c chan *Tweet, start int) {
 	stream.pos = start
-	tweet, err := stream.Next()
-	if err == ErrEOF {
-		return
-	}
+	tweet, _ := stream.Next()
 	c <- tweet
 
 }
@@ -67,5 +64,6 @@ func main() {
 		}
 	}
 
+	fmt.Printf("%d tweets analysed\n", length)
 	fmt.Printf("Process took %s\n", time.Since(start))
 }
