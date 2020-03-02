@@ -32,6 +32,7 @@ func consumer(c chan *Tweet) {
 
 }
 
+// global variable
 var counter int
 
 func main() {
