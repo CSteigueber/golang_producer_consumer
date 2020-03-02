@@ -17,22 +17,25 @@ func producer(stream Stream, c chan *Tweet, start int) {
 	stream.pos = start
 	tweet, _ := stream.Next()
 	c <- tweet
+	close(c)
 
 }
 
 func consumer(c chan *Tweet) {
 	tweet := <-c
-
 	if tweet.IsTalkingAboutGo() {
 		fmt.Println(tweet.Username, "\ttweets about golang")
 	} else {
 		fmt.Println(tweet.Username, "\tdoes not tweet about golang")
 	}
+	counter++
 
-	close(c)
 }
 
+var counter int
+
 func main() {
+	counter = 0
 	start := time.Now()
 	stream := GetMockStream()
 	length := len(stream.tweets)
@@ -52,18 +55,12 @@ func main() {
 	}
 	consumer(c[length-1])
 	for {
-		allClosed := true
-		for i := 0; i < length; i++ {
-			_, open := <-c[i]
-			if open {
-				allClosed = false
-			}
-		}
-		if allClosed {
+		if counter == length {
 			break
 		}
 	}
 
-	fmt.Printf("%d tweets analysed\n", length)
+	fmt.Printf("%d tweets in input\n", length)
+	fmt.Printf("%d tweets in output\n", counter)
 	fmt.Printf("Process took %s\n", time.Since(start))
 }
