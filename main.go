@@ -15,54 +15,57 @@ import (
 
 func producer(stream Stream, c chan *Tweet, start int) {
 	stream.pos = start
-	for {
-		tweet, err := stream.Next()
-		if err == ErrEOF {
-			break
-		}
-		c <- tweet
+	tweet, err := stream.Next()
+	if err == ErrEOF {
+		return
 	}
-	close(c)
+	c <- tweet
+
 }
 
 func consumer(c chan *Tweet) {
-	for {
-		tweet, open := <-c
-		if !open {
-			break
-		}
+	tweet := <-c
 
-		if tweet.IsTalkingAboutGo() {
-			fmt.Println(tweet.Username, "\ttweets about golang")
-		} else {
-			fmt.Println(tweet.Username, "\tdoes not tweet about golang")
-		}
+	if tweet.IsTalkingAboutGo() {
+		fmt.Println(tweet.Username, "\ttweets about golang")
+	} else {
+		fmt.Println(tweet.Username, "\tdoes not tweet about golang")
 	}
+
+	close(c)
 }
 
 func main() {
 	start := time.Now()
 	stream := GetMockStream()
-	//length:= len(stream.tweets)
-	c1 := make(chan *Tweet)
-	c2 := make(chan *Tweet)
-	c3 := make(chan *Tweet)
-	c4 := make(chan *Tweet)
-	c5 := make(chan *Tweet)
-
+	length := len(stream.tweets)
+	var c []chan *Tweet
+	for i := 0; i < length; i++ {
+		c = append(c, make(chan *Tweet))
+	}
 	// Producer
-	go producer(stream, c1, 0)
-	go producer(stream, c2, 1)
-	go producer(stream, c3, 2)
-	go producer(stream, c4, 3)
-	go producer(stream, c5, 4)
+
+	for i := 0; i < length; i++ {
+		go producer(stream, c[i], i)
+	}
 
 	// Consumer
-	go consumer(c1)
-	go consumer(c2)
-	go consumer(c3)
-	go consumer(c4)
-	consumer(c5)
+	for i := 0; i < length-1; i++ {
+		go consumer(c[i])
+	}
+	consumer(c[length-1])
+	for {
+		allClosed := true
+		for i := 0; i < length; i++ {
+			_, open := <-c[i]
+			if open {
+				allClosed = false
+			}
+		}
+		if allClosed {
+			break
+		}
+	}
 
 	fmt.Printf("Process took %s\n", time.Since(start))
 }
