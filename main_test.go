@@ -27,6 +27,9 @@ func TestIsTalkingAboutGo(t *testing.T) {
 func TestGetStream(t *testing.T) {
 	tables := []Stream{
 		{0, []Tweet{Tweet{"user", "tweet"}, {"user2", "tweet2"}}},
+		{0, []Tweet{}},
+		{0, []Tweet{Tweet{"Han Solo", "Am I alone in this Stream? Wher is Chewbaka?"}}},
+		{0, []Tweet{Tweet{"Trollwurf", "Husaah it works!"}, {"Claas", "Who is that Trollwurf guy?"}, {"Tester69", "Cheap online test? Click here!"}}},
 	}
 	for _, table := range tables {
 		stream := GetStream(table.tweets)
@@ -43,4 +46,29 @@ func TestGetStream(t *testing.T) {
 
 	}
 
+}
+func TestNext(t *testing.T) {
+	tables := []Stream{
+		{1, []Tweet{Tweet{"user", "tweet"}, {"user2", "tweet2"}}},
+		{0, []Tweet{}},
+		{0, []Tweet{Tweet{"Han Solo", "Am I alone in this Stream? Wher is Chewbaka?"}}},
+		{1, []Tweet{Tweet{"Trollwurf", "Husaah it works!"}, {"Claas", "Who is that Trollwurf-guy?"}, {"Tester69", "Cheap online test? Click here!"}}},
+	}
+	for _, table := range tables {
+		start := table.pos
+		if table.pos >= len(table.tweets) {
+			_, err := table.Next()
+			if err != ErrEOF {
+				t.Errorf("Error! Missed end of file!")
+			}
+		} else {
+			tweet, _ := table.Next()
+			if *tweet != table.tweets[start] {
+				t.Errorf("Error! wrong tweet loaded!")
+			}
+			if start == table.pos {
+				t.Errorf("Error! Position in stream was not increased!")
+			}
+		}
+	}
 }

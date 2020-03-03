@@ -56,7 +56,7 @@
 				
 				<option value="file0">mockstream/main.go (0.0%)</option>
 				
-				<option value="file1">mockstream/mockstream.go (45.5%)</option>
+				<option value="file1">mockstream/mockstream.go (100.0%)</option>
 				
 				</select>
 			</div>
@@ -170,15 +170,15 @@ var ErrEOF = errors.New("End of File")
 
 // Next returns the next Tweet in the stream, returns EOF error if
 // there are no more tweets
-func (s *Stream) Next() (*Tweet, error) <span class="cov0" title="0">{
+func (s *Stream) Next() (*Tweet, error) <span class="cov8" title="1">{
 
         // simulate delay
         time.Sleep(320 * time.Millisecond)
-        if s.pos &gt;= len(s.tweets) </span><span class="cov0" title="0">{
+        if s.pos &gt;= len(s.tweets) </span><span class="cov8" title="1">{
                 return &amp;Tweet{}, ErrEOF
         }</span>
 
-        <span class="cov0" title="0">tweet := s.tweets[s.pos]
+        <span class="cov8" title="1">tweet := s.tweets[s.pos]
         s.pos++
 
         return &amp;tweet, nil</span>
