@@ -5,5 +5,5 @@ To achieve a faster performance I opened a channel and a go routine for each twe
 
 
 # Testing
-Unit testing only covers ca 29% of the package and 100% of the file mockstream.go.
+Unit testing covers ca 29% for now of the whole package and 100% of the file mockstream.go.
 I changed the function func GetMockStream into func GetStream in the file mockstream.go to ease testing this function.
