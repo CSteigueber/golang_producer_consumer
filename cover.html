@@ -54,7 +54,7 @@
 			<div id="nav">
 				<select id="files">
 				
-				<option value="file0">mockstream/main.go (0.0%)</option>
+				<option value="file0">mockstream/main.go (13.8%)</option>
 				
 				<option value="file1">mockstream/mockstream.go (100.0%)</option>
 				
@@ -103,6 +103,13 @@ func consumer(c chan *Tweet) <span class="cov0" title="0">{
         <span class="cov0" title="0">counter++</span>
 
 }
+func makeChannels(length int) []chan *Tweet <span class="cov8" title="1">{
+        var c []chan *Tweet
+        for i := 0; i &lt; length; i++ </span><span class="cov8" title="1">{
+                c = append(c, make(chan *Tweet))
+        }</span>
+        <span class="cov8" title="1">return c</span>
+}
 
 // global variable
 var counter int
@@ -112,13 +119,10 @@ func main() <span class="cov0" title="0">{
         start := time.Now()
         stream := GetStream(mockdata)
         length := len(stream.tweets)
-        var c []chan *Tweet
-        for i := 0; i &lt; length; i++ </span><span class="cov0" title="0">{
-                c = append(c, make(chan *Tweet))
-        }</span>
+        c := makeChannels(length)
         // Producer
 
-        <span class="cov0" title="0">for i := 0; i &lt; length; i++ </span><span class="cov0" title="0">{
+        for i := 0; i &lt; length; i++ </span><span class="cov0" title="0">{
                 go producer(stream, c[i], i)
         }</span>
 

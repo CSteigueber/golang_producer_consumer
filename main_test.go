@@ -72,3 +72,14 @@ func TestNext(t *testing.T) {
 		}
 	}
 }
+func TestMakeChannels(t *testing.T) {
+	tables := []int{
+		1, 2, 5,
+	}
+	for _, table := range tables {
+		c := makeChannels(table)
+		if len(c) != table {
+			t.Errorf("Error! Wrong amount of chanels produced! Expected %v and got %v", table, len(c))
+		}
+	}
+}

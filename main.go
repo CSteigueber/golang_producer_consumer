@@ -31,6 +31,13 @@ func consumer(c chan *Tweet) {
 	counter++
 
 }
+func makeChannels(length int) []chan *Tweet {
+	var c []chan *Tweet
+	for i := 0; i < length; i++ {
+		c = append(c, make(chan *Tweet))
+	}
+	return c
+}
 
 // global variable
 var counter int
@@ -38,12 +45,9 @@ var counter int
 func main() {
 	counter = 0
 	start := time.Now()
-	stream := GetMockStream()
+	stream := GetStream(mockdata)
 	length := len(stream.tweets)
-	var c []chan *Tweet
-	for i := 0; i < length; i++ {
-		c = append(c, make(chan *Tweet))
-	}
+	c := makeChannels(length)
 	// Producer
 
 	for i := 0; i < length; i++ {
