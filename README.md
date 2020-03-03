@@ -8,5 +8,4 @@ When many tweets are checked (>2000) some tweets are skipped. =>channels closed 
 
 
 # Testing
-Unit testing only covers 13% of the code and tests only the function "IsTalkingAboutGo" because this is the only function with a return statement.
-=> not true, Next and GetMockstream have return values too and should be tested.
+Unit testing only covers 13% with focus on func IsTalkingAboutGo and GetStream. I changed GetMockStream into GetStream to ease testing of that function.
