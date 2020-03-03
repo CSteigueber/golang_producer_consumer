@@ -9,3 +9,4 @@ When many tweets are checked (>2000) some tweets are skipped. =>channels closed 
 
 # Testing
 Unit testing only covers 13% of the code and tests only the function "IsTalkingAboutGo" because this is the only function with a return statement.
+=> not true, Next and GetMockstream have return values too and should be tested.
