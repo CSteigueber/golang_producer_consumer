@@ -2,28 +2,6 @@ package main
 
 import "testing"
 
-func TestIsTalkingAboutGo(t *testing.T) {
-	tables := []struct {
-		tweet  Tweet
-		result bool
-	}{
-		{Tweet{"Trollwurf", "golang is so awesome"}, true},
-		{Tweet{"SomeRandomDude", "qddfgolangdcenjen"}, true},
-		{Tweet{"Pumuckel", " dont forget about the gopher"}, true},
-		{Tweet{"GuyFawkes", "Go get some coffee"}, false},
-		{Tweet{"Tester69", "GOLANG FOR PRESIDENT!!"}, true},
-		{Tweet{"Oedipus", "GOPHERS GONE WILD!!"}, true},
-		{Tweet{"Neo", "12*%c!@"}, false},
-	}
-	for _, table := range tables {
-		output := table.tweet.IsTalkingAboutGo()
-		if output != table.result {
-			t.Errorf("Error! Expected %t but function returned %t from user %s tweeting '%s'!!", table.result, output, table.tweet.Username, table.tweet.Text)
-		} else {
-			t.Logf("Success! Expected Tweet %v from %v to result in %t and got %t", table.tweet.Text, table.tweet.Username, table.result, output)
-		}
-	}
-}
 func TestGetMockStream(t *testing.T) {
 	stream := GetMockStream()
 	for i := 0; i < len(mockdata); i++ {
@@ -35,6 +13,7 @@ func TestGetMockStream(t *testing.T) {
 	}
 
 }
+
 func TestNext(t *testing.T) {
 	tables := []Stream{
 		{1, []Tweet{Tweet{"user", "tweet"}, {"user2", "tweet2"}}},
@@ -79,8 +58,8 @@ func TestProducer(t *testing.T) {
 		start  int
 		result Tweet
 	}{
-		{Stream{0, []Tweet{Tweet{"user", "tweet"}, {"user", "tweet2"}}}, make(chan *Tweet, 2), 0, Tweet{"user", "tweet"}},
-		{Stream{0, []Tweet{Tweet{"user", "tweet"}, {"user", "tweet2"}, {"user2", "tweet3"}}}, make(chan *Tweet, 2), 1, Tweet{"user", "tweet2"}},
+		{Stream{0, []Tweet{Tweet{"user", "tweet"}, {"user", "tweet2"}}}, make(chan *Tweet, 1), 0, Tweet{"user", "tweet"}},
+		{Stream{0, []Tweet{Tweet{"user", "tweet"}, {"user", "tweet2"}, {"user2", "tweet3"}}}, make(chan *Tweet, 1), 1, Tweet{"user", "tweet2"}},
 	}
 	for _, table := range tables {
 		producer(table.stream, table.c, table.start)
@@ -107,7 +86,7 @@ func TestConsumer(t *testing.T) {
 		{Tweet{"Oedipus", "GOPHERS GONE WILD!!"}, true},
 		{Tweet{"Neo", "12*%c!@"}, false},
 	}
-	c := make(chan *Tweet, 2)
+	c := make(chan *Tweet, 1)
 	for _, table := range tables {
 		c <- &table.tweet
 		output := consumer(c)

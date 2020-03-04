@@ -21,6 +21,7 @@ func producer(stream Stream, c chan *Tweet, start int) {
 
 }
 
+// consumer is returning a bolean which isn't used in program execution but eases testing
 func consumer(c chan *Tweet) bool {
 	tweet := <-c
 	var result bool
@@ -44,9 +45,10 @@ func makeChannels(length int) []chan *Tweet {
 }
 
 // global variable
-var counter int
+var counter = 0
 
 func main() {
+
 	counter = 0
 	start := time.Now()
 	stream := GetMockStream()
@@ -57,7 +59,6 @@ func main() {
 	for i := 0; i < length; i++ {
 		go producer(stream, c[i], i)
 	}
-
 	// Consumer
 	for i := 0; i < length-1; i++ {
 		go consumer(c[i])
