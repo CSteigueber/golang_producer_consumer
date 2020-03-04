@@ -21,14 +21,18 @@ func producer(stream Stream, c chan *Tweet, start int) {
 
 }
 
-func consumer(c chan *Tweet) {
+func consumer(c chan *Tweet) bool {
 	tweet := <-c
+	var result bool
 	if tweet.IsTalkingAboutGo() {
-		fmt.Println(tweet.Username, "\ttweets about golang")
+		fmt.Println(tweet.Username + "\ttweets about golang")
+		result = true
 	} else {
-		fmt.Println(tweet.Username, "\tdoes not tweet about golang")
+		fmt.Println(tweet.Username + "\tdoes not tweet about golang")
+		result = false
 	}
 	counter++
+	return result
 
 }
 func makeChannels(length int) []chan *Tweet {
@@ -45,7 +49,7 @@ var counter int
 func main() {
 	counter = 0
 	start := time.Now()
-	stream := GetStream(mockdata)
+	stream := GetMockStream()
 	length := len(stream.tweets)
 	c := makeChannels(length)
 	// Producer
@@ -59,13 +63,13 @@ func main() {
 		go consumer(c[i])
 	}
 	consumer(c[length-1])
+
+	// Waiting for the consumers to finish
 	for {
 		if counter == length {
 			break
 		}
 	}
 
-	fmt.Printf("%d tweets in input\n", length)
-	fmt.Printf("%d tweets in output\n", counter)
 	fmt.Printf("Process took %s\n", time.Since(start))
 }
