@@ -54,9 +54,9 @@
 			<div id="nav">
 				<select id="files">
 				
-				<option value="file0">mockstream/main.go (54.8%)</option>
+				<option value="file0">/home/claas/Code/golang_producer_consumer/main.go (60.0%)</option>
 				
-				<option value="file1">mockstream/mockstream.go (100.0%)</option>
+				<option value="file1">/home/claas/Code/golang_producer_consumer/mockstream.go (100.0%)</option>
 				
 				</select>
 			</div>
@@ -85,64 +85,52 @@ import (
         "time"
 )
 
+// global variables
+var counter = 0
+
 func producer(stream Stream, c chan *Tweet, start int) <span class="cov8" title="1">{
         stream.pos = start
         tweet, _ := stream.Next()
         c &lt;- tweet
         close(c)
-
 }</span>
 
-func consumer(c chan *Tweet) bool <span class="cov8" title="1">{
+// consumer is returning a bolean which isn't used in program execution but eases testing
+func consumer(c chan *Tweet) (result bool) <span class="cov8" title="1">{
         tweet := &lt;-c
-        var result bool
         if tweet.IsTalkingAboutGo() </span><span class="cov8" title="1">{
-                fmt.Println(tweet.Username + "\ttweets about golang")
+                fmt.Printf("%s\ttweets about golang\n", tweet.Username)
                 result = true
         }</span> else<span class="cov8" title="1"> {
-                fmt.Println(tweet.Username + "\tdoes not tweet about golang")
+                fmt.Printf("%s\tdoes not tweet about golang\n", tweet.Username)
                 result = false
         }</span>
         <span class="cov8" title="1">counter++
         return result</span>
-
 }
-func makeChannels(length int) []chan *Tweet <span class="cov8" title="1">{
-        var c []chan *Tweet
+func makeChannels(length int) (c []chan *Tweet) <span class="cov8" title="1">{
         for i := 0; i &lt; length; i++ </span><span class="cov8" title="1">{
                 c = append(c, make(chan *Tweet))
         }</span>
         <span class="cov8" title="1">return c</span>
 }
-
-// global variable
-var counter int
-
 func main() <span class="cov0" title="0">{
-        counter = 0
-        start := time.Now()
-        stream := GetMockStream()
-        length := len(stream.tweets)
-        c := makeChannels(length)
+        var start = time.Now()
+        var stream = GetMockStream()
+        var length = len(stream.tweets)
+        var c = makeChannels(length)
         // Producer
-
         for i := 0; i &lt; length; i++ </span><span class="cov0" title="0">{
                 go producer(stream, c[i], i)
         }</span>
-
         // Consumer
-        <span class="cov0" title="0">for i := 0; i &lt; length-1; i++ </span><span class="cov0" title="0">{
+        <span class="cov0" title="0">for i := 0; i &lt; length; i++ </span><span class="cov0" title="0">{
                 go consumer(c[i])
         }</span>
-        <span class="cov0" title="0">consumer(c[length-1])
 
         // Waiting for the consumers to finish
-        for </span><span class="cov0" title="0">{
-                if counter == length </span><span class="cov0" title="0">{
-                        break</span>
-                }
-        }
-
+        <span class="cov0" title="0">for counter != length </span>{<span class="cov0" title="0">
+        }</span>
         <span class="cov0" title="0">fmt.Printf("Process took %s\n", time.Since(start))</span>
 }
 </pre>
