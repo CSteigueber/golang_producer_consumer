@@ -8,4 +8,4 @@ I tested performance with an increased sample size. The program can analyse abou
 
 
 # Testing
-Unit testing covers ca 66% for now of the whole package and 100% of the file mockstream.go.
+Unit testing covers ca 72% of the whole package and 100% of the file mockstream.go.
