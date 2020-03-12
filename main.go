@@ -17,10 +17,9 @@ func producer(stream Stream, c chan *Tweet, start int) {
 	stream.pos = start
 	tweet, _ := stream.Next()
 	c <- tweet
-	//close(c)
 }
 
-// consumer is returning a bolean which isn't used in program execution but eases testing
+// consumer is returning a boolean which isn't used in program execution but eases testing
 func consumer(c chan *Tweet, consumerHasFinished chan bool) (result bool) {
 	tweet := <-c
 	if tweet.IsTalkingAboutGo() {
