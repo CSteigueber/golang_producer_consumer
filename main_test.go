@@ -39,17 +39,6 @@ func TestNext(t *testing.T) {
 		}
 	}
 }
-func TestMakeChannels(t *testing.T) {
-	tables := []int{
-		1, 2, 5,
-	}
-	for _, table := range tables {
-		c := makeChannels(table)
-		if len(c) != table {
-			t.Errorf("Error! Wrong amount of chanels produced! Expected %v and got %v", table, len(c))
-		}
-	}
-}
 
 func TestProducer(t *testing.T) {
 	tables := []struct {
@@ -75,23 +64,29 @@ func TestProducer(t *testing.T) {
 }
 func TestConsumer(t *testing.T) {
 	tables := []struct {
-		tweet  Tweet
-		result bool
+		tweet               Tweet
+		result              bool
+		consumerHasFinished bool
 	}{
-		{Tweet{"Trollwurf", "golang is so awesome"}, true},
-		{Tweet{"SomeRandomDude", "qddfgolangdcenjen"}, true},
-		{Tweet{"Pumuckel", " dont forget about the gopher"}, true},
-		{Tweet{"GuyFawkes", "Go get some coffee"}, false},
-		{Tweet{"Tester69", "GOLANG FOR PRESIDENT!!"}, true},
-		{Tweet{"Oedipus", "GOPHERS GONE WILD!!"}, true},
-		{Tweet{"Neo", "12*%c!@"}, false},
+		{Tweet{"Trollwurf", "golang is so awesome"}, true, true},
+		{Tweet{"SomeRandomDude", "qddfgolangdcenjen"}, true, true},
+		{Tweet{"Pumuckel", " dont forget about the gopher"}, true, true},
+		{Tweet{"GuyFawkes", "Go get some coffee"}, false, true},
+		{Tweet{"Tester69", "GOLANG FOR PRESIDENT!!"}, true, true},
+		{Tweet{"Oedipus", "GOPHERS GONE WILD!!"}, true, true},
+		{Tweet{"Neo", "12*%c!@"}, false, true},
 	}
 	c := make(chan *Tweet, 1)
+	consumerHasFinished := make(chan bool, 1)
 	for _, table := range tables {
 		c <- &table.tweet
-		output := consumer(c)
+		output := consumer(c, consumerHasFinished)
 		if output != table.result {
 			t.Errorf("Error! Expected'%t'\tbut received\t'%t'\tfrom function consumer() with tweet %s", table.result, output, table.tweet.Text)
+		}
+		if finished := <-consumerHasFinished; finished != table.consumerHasFinished {
+			t.Error("Error! Consumer doesn't send on channel 'consumerHasFinished'!")
+
 		}
 
 	}

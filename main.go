@@ -13,18 +13,15 @@ import (
 	"time"
 )
 
-// global variables
-var counter = 0
-
 func producer(stream Stream, c chan *Tweet, start int) {
 	stream.pos = start
 	tweet, _ := stream.Next()
 	c <- tweet
-	close(c)
+	//close(c)
 }
 
 // consumer is returning a bolean which isn't used in program execution but eases testing
-func consumer(c chan *Tweet) (result bool) {
+func consumer(c chan *Tweet, consumerHasFinished chan bool) (result bool) {
 	tweet := <-c
 	if tweet.IsTalkingAboutGo() {
 		fmt.Printf("%s\ttweets about golang\n", tweet.Username)
@@ -33,31 +30,29 @@ func consumer(c chan *Tweet) (result bool) {
 		fmt.Printf("%s\tdoes not tweet about golang\n", tweet.Username)
 		result = false
 	}
-	counter++
+	consumerHasFinished <- true
 	return result
 }
-func makeChannels(length int) (c []chan *Tweet) {
-	for i := 0; i < length; i++ {
-		c = append(c, make(chan *Tweet))
-	}
-	return c
-}
+
 func main() {
 	var start = time.Now()
 	var stream = GetMockStream()
 	var length = len(stream.tweets)
-	var c = makeChannels(length)
-	// Producer
+	c := make(chan *Tweet)
+	defer close(c)
+	consumerHasFinished := make(chan bool)
+	// Build Producer for each tweet
 	for i := 0; i < length; i++ {
-		go producer(stream, c[i], i)
+		go producer(stream, c, i)
 	}
-	// Consumer
+	// Build Consumer for each tweet
 	for i := 0; i < length; i++ {
-		go consumer(c[i])
+		go consumer(c, consumerHasFinished)
 	}
 
-	// Waiting for the consumers to finish
-	for counter != length {
+	// Waiting for all consumers to finish
+	for i := 0; i < length; i++ {
+		<-consumerHasFinished
 	}
 	fmt.Printf("Process took %s\n", time.Since(start))
 }
